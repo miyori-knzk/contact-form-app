@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class TagRequest extends FormRequest
+class StoreTagRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +27,7 @@ class TagRequest extends FormRequest
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('tags', 'name')->ignore($this->tag),
+                'unique:tags,name',
             ],
         ];
     }
