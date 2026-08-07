@@ -20,6 +20,6 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('', AdminController::class, ['as' => 'admin'])->only(['index']);
+    Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::resource('tags', TagController::class)->except(['index', 'create', 'show']);
 });

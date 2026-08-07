@@ -10,7 +10,7 @@ class TagController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RagRequest $request)
+    public function store(TagRequest $request)
     {
         Tag::create($request->validated());
 
@@ -22,7 +22,8 @@ class TagController extends Controller
      */
     public function edit(Tag $tag)
     {
-        return view('admin.tags.edit', compact($tag));
+
+        return view('admin.tags.edit', compact('tag'));
     }
 
     /**
@@ -30,7 +31,7 @@ class TagController extends Controller
      */
     public function update(TagRequest $request, Tag $tag)
     {
-        Tag::update($request->validated());
+        $tag->update($request->validated());
 
         return redirect()->route('admin.index')->with('success', 'タグを更新しました。');
     }
