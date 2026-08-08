@@ -17,8 +17,15 @@ class AdminController extends Controller
         $categories = Category::all();
         $tags = Tag::all();
 
-        $contacts = Contact::makeQuery($request)->with('category')->paginate(7);
+        $contacts = Contact::makeQuery($request)->with('category', 'contactTags.tag')->paginate(7);
 
         return view('admin.index', compact('categories', 'contacts', 'tags'));
+    }
+
+    public function show($contactId)
+    {
+        $contact = Contact::with('contactTags.tag')->find($contactId);
+
+        return view('admin.show', compact('contact'));
     }
 }
