@@ -13,7 +13,7 @@
                         <span class="text-sm font-medium text-white">お名前</span>
                     </div>
                     <div class="col-span-2 bg-white px-6 py-4 flex items-center">
-                        <span class="text-[#6b5744]">{{ $validated['first_name'] }} {{ $validated['last_name'] }}</span>
+                        <span class="text-[#6b5744]">{{ $validated['last_name'] }} {{ $validated['first_name'] }}</span>
                     </div>
                 </div>
 
@@ -114,6 +114,7 @@
                 <input type="hidden" name="gender" value="{{ $validated['gender'] }}">
                 <input type="hidden" name="email" value="{{ $validated['email'] }}">
                 <input type="hidden" name="tel" value="{{ $validated['tel'] }}">
+                <input type="hidden" name="tmpTel" value="{{ $tmpTel }}">
                 <input type="hidden" name="address" value="{{ $validated['address'] }}">
                 <input type="hidden" name="building" value="{{ $validated['building'] ?? '' }}">
                 <input type="hidden" name="category_id" value="{{ $validated['category_id'] }}">
@@ -130,7 +131,7 @@
                         class="px-16 py-3 bg-[#7d7470] hover:bg-[#6b5f57] border border-transparent rounded font-medium text-white transition">
                         送信
                     </button>
-                    <button type="button" onclick="history.back()"
+                    <button type="submit" value="back" name="back"
                         class="px-8 py-3 text-[#6b5744] transition">
                         修正
                     </button>
