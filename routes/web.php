@@ -29,5 +29,6 @@ Route::controller(ContactController::class)->name('contacts.')->group(function (
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
+    Route::get('/contacts/{contactId}', [AdminController::class, 'show'])->name('show');
     Route::resource('tags', TagController::class)->except(['index', 'create', 'show']);
 });

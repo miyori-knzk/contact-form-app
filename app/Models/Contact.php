@@ -43,7 +43,9 @@ class Contact extends Model
         }
 
         if ($request->filled('gender')) {
-            $query->where('gender', '=', $request->gender);
+            if ($request->gender != 0) {
+                $query->where('gender', '=', $request->gender);
+            }
         }
 
         if ($request->filled('category_id')) {
@@ -65,5 +67,15 @@ class Contact extends Model
     public function contactTags(): HasMany
     {
         return $this->hasMany(ContactTag::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(
+            Tag::class,
+            'contact_tags',
+            'contact_id',
+            'tag_id'
+        );
     }
 }
