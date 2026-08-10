@@ -38,7 +38,7 @@ class TagController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove thdatabase/migrationse specified resource from storage.
      */
     public function destroy(Tag $tag)
     {
