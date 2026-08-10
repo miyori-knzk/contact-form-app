@@ -28,4 +28,11 @@ class AdminController extends Controller
 
         return view('admin.show', compact('contact'));
     }
+
+    public function destroy($contactId)
+    {
+        $contact = Contact::find($contactId)->delete();
+
+        return redirect()->route('admin.index');
+    }
 }
