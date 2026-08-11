@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Contact;
 use App\Models\Tag;
-use Illuminate\Http\Request;
+use App\Http\Requests\IndexContactRequest;
+
 
 class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(IndexContactRequest $request)
     {
         $categories = Category::all();
         $tags = Tag::all();

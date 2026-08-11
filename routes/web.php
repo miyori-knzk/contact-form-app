@@ -16,9 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 Route::controller(ContactController::class)->name('contacts.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/contacts/confirm', 'confirm')->name('confirm');
