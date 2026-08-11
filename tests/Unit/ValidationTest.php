@@ -2,16 +2,12 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\User;
-use App\Models\Contact;
 use App\Models\Category;
+use App\Models\Contact;
 use App\Models\Tag;
-
-
-
-
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ValidationTest extends TestCase
 {
@@ -32,7 +28,7 @@ class ValidationTest extends TestCase
         ];
 
         $urlQuery = http_build_query($data);
-        $url = '/admin?'. $urlQuery;
+        $url = '/admin?' . $urlQuery;
 
         $responce = $this->actingAs($user)->get($url);
         $responce->assertStatus(200);
@@ -53,7 +49,7 @@ class ValidationTest extends TestCase
         ];
 
         $urlQuery = http_build_query($data);
-        $url = '/admin?'. $urlQuery;
+        $url = '/admin?' . $urlQuery;
 
         $responce = $this->actingAs($user)->get($url);
 
@@ -68,7 +64,7 @@ class ValidationTest extends TestCase
         $category = Category::factory()->create();
         $tag = Tag::factory()->count(2)->create();
 
-        $tmpContact = array(
+        $tmpContact = [
             'first_name' => 'テスト名',
             'last_name' => 'テスト姓',
             'gender' => 1,
@@ -76,9 +72,9 @@ class ValidationTest extends TestCase
             'tel' => '09012345678',
             'address' => '沖縄県',
             'category_id' => $category->id,
-            'tag_ids' => array(1,2),
+            'tag_ids' => [1, 2],
             'detail' => 'テスト内容',
-        );
+        ];
 
         $responce = $this->actingAs($user)->post(route('contacts.store'), $tmpContact);
         $responce->assertSessionHasNoErrors();
@@ -91,7 +87,7 @@ class ValidationTest extends TestCase
         $category = Category::factory()->create();
         $tag = Tag::factory()->count(2)->create();
 
-        $tmpContact = array(
+        $tmpContact = [
             'first_name' => 'テスト名',
             'last_name' => 'テスト姓',
             'gender' => 1,
@@ -99,9 +95,9 @@ class ValidationTest extends TestCase
             'tel' => '090123456',
             'address' => '沖縄県',
             'category_id' => $category->id,
-            'tag_ids' => array(1,2),
+            'tag_ids' => [1, 2],
             'detail' => 'テスト内容',
-        );
+        ];
 
         $responce = $this->actingAs($user)->post(route('contacts.store'), $tmpContact);
         $responce->assertSessionHasErrors('tel');
@@ -112,9 +108,9 @@ class ValidationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $tmpTag = array(
+        $tmpTag = [
             'name' => '',
-        );
+        ];
 
         $responce = $this->actingAs($user)->post(route('admin.tags.store'), $tmpTag);
         $responce->assertSessionHasErrors('name');
@@ -125,9 +121,9 @@ class ValidationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $tmpTag = array(
+        $tmpTag = [
             'name' => str_repeat('あ', 51),
-        );
+        ];
 
         $responce = $this->actingAs($user)->post(route('admin.tags.store'), $tmpTag);
         $responce->assertSessionHasErrors('name');
@@ -139,9 +135,9 @@ class ValidationTest extends TestCase
         $user = User::factory()->create();
         Tag::factory()->create(['name' => 'テストタグ']);
 
-        $tmpTag = array(
+        $tmpTag = [
             'name' => 'テストタグ',
-        );
+        ];
 
         $responce = $this->actingAs($user)->post(route('admin.tags.store'), $tmpTag);
         $responce->assertSessionHasErrors('name');

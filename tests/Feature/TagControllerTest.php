@@ -2,16 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\Tag;
-
 
 class TagControllerTest extends TestCase
 {
     use RefreshDatabase;
-    
+
     /** @test */
     public function 認証済みユーザーはタグの編集画面を表示できる(): void
     {
@@ -35,10 +34,9 @@ class TagControllerTest extends TestCase
         ]);
 
         $response->assertRedirect(route('admin.index'));
-        $this->assertDatabaseHas('tags',[
+        $this->assertDatabaseHas('tags', [
             'name' => 'テストタグ',
         ]);
-
 
     }
 
@@ -76,7 +74,6 @@ class TagControllerTest extends TestCase
         $response = $this->post(route('admin.tags.store'), [
             'name' => 'テストタグ',
         ]);
-
 
         $response->assertRedirect(route('login'));
     }

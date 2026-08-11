@@ -2,18 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
+use App\Models\Contact;
+use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\Category;
-use App\Models\Tag;
-use App\Models\Contact;
-
-
-
 
 class ContactControllerTest extends TestCase
 {
-
     use RefreshDatabase;
 
     /** @test */
@@ -32,7 +28,7 @@ class ContactControllerTest extends TestCase
     /** @test */
     public function サンクスページが表示できる(): void
     {
-        $response= $this->get(route('contacts.thanks'));
+        $response = $this->get(route('contacts.thanks'));
 
         $response->assertStatus(200);
     }
@@ -55,11 +51,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'last_name' => '',
         ]);
 
-        $response ->assertSessionHasErrors('last_name');
+        $response->assertSessionHasErrors('last_name');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -69,11 +65,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'first_name' => '',
         ]);
 
-        $response ->assertSessionHasErrors('first_name');
+        $response->assertSessionHasErrors('first_name');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -83,11 +79,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'gender' => '',
         ]);
 
-        $response ->assertSessionHasErrors('gender');
+        $response->assertSessionHasErrors('gender');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -97,11 +93,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'email' => '',
         ]);
 
-        $response ->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors('email');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -111,14 +107,13 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'email' => 'test.com',
         ]);
 
-        $response ->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors('email');
         $response->assertRedirect(route('contacts.index'));
     }
-
 
     /** @test */
     public function 電話番号が未入力だとバリデーションエラーになりお問い合わせフォーム入力ページにリダイレクトされる(): void
@@ -127,11 +122,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'tel' => '',
         ]);
 
-        $response ->assertSessionHasErrors('tel');
+        $response->assertSessionHasErrors('tel');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -142,11 +137,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'address' => '',
         ]);
 
-        $response ->assertSessionHasErrors('tel');
+        $response->assertSessionHasErrors('tel');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -157,11 +152,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'category_id' => '',
         ]);
 
-        $response ->assertSessionHasErrors('category_id');
+        $response->assertSessionHasErrors('category_id');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -172,11 +167,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'detail' => '',
         ]);
 
-        $response ->assertSessionHasErrors('detail');
+        $response->assertSessionHasErrors('detail');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -187,11 +182,11 @@ class ContactControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Tag::factory()->count(3)->create();
 
-        $response  = $this->post(route('contacts.confirm'), [
+        $response = $this->post(route('contacts.confirm'), [
             'detail' => str_repeat('あ', 121),
         ]);
 
-        $response ->assertSessionHasErrors('detail');
+        $response->assertSessionHasErrors('detail');
         $response->assertRedirect(route('contacts.index'));
     }
 
@@ -207,7 +202,7 @@ class ContactControllerTest extends TestCase
 
         $response = $this->post(route('contacts.store'), $contactArray);
 
-        $response ->assertRedirect(route('contacts.thanks'));
+        $response->assertRedirect(route('contacts.thanks'));
         $this->assertDatabaseHas('contacts', [
             'last_name' => 'テスト名',
             'detail' => 'テスト',
@@ -226,14 +221,14 @@ class ContactControllerTest extends TestCase
             'tag_ids' => '文字',
         ]);
 
-        $response ->assertRedirect(route('contacts.index'));
+        $response->assertRedirect(route('contacts.index'));
         $this->assertDatabaseMissing('contacts', [
             'first_name' => 'テスト名',
             'detail' => 'テスト',
         ]);
     }
 
-        /** @test */
+    /** @test */
     public function 確認画面で、タグが存在しない値だった場合バリデーションエラーとなりリダイレクトされる(): void
     {
         Category::factory()->count(3)->create();
@@ -245,14 +240,10 @@ class ContactControllerTest extends TestCase
             'tag_ids' => 99,
         ]);
 
-        $response ->assertRedirect(route('contacts.index'));
+        $response->assertRedirect(route('contacts.index'));
         $this->assertDatabaseMissing('contacts', [
             'first_name' => 'テスト名',
             'detail' => 'テスト',
         ]);
     }
-
-    
-
-
 }

@@ -2,12 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
+use App\Models\Contact;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\Contact;
-use App\Models\Category;
-use App\Models\User;
-
 
 class AdminControllerTest extends TestCase
 {
@@ -20,7 +19,6 @@ class AdminControllerTest extends TestCase
         Category::factory()->count(3)->create();
         Contact::factory()->count(5)->create();
         Contact::factory()->create(['email' => 'test@test']);
-
 
         $response = $this->actingAs($user)->get('/admin?keyword=test');
 
@@ -35,19 +33,18 @@ class AdminControllerTest extends TestCase
         $user = User::factory()->create();
         Category::factory()->count(3)->create();
 
-
         $man = Contact::factory()->create([
-                                            'first_name' => '太郎',
-                                            'gender' => 1
-                                        ]);
+            'first_name' => '太郎',
+            'gender' => 1,
+        ]);
         $woman = Contact::factory()->create([
-                                            'first_name' => '花子',
-                                            'gender' => 2
-                                        ]);
+            'first_name' => '花子',
+            'gender' => 2,
+        ]);
         $other = Contact::factory()->create([
-                                            'first_name' => '零',
-                                            'gender' => 3
-                                        ]);
+            'first_name' => '零',
+            'gender' => 3,
+        ]);
 
         $response = $this->actingAs($user)->get('/admin?gender=1');
 
@@ -62,7 +59,6 @@ class AdminControllerTest extends TestCase
     {
         $user = User::factory()->create();
         Category::factory()->count(3)->create();
-
 
         Contact::factory()->count(5)->create();
         Contact::factory()->create([
@@ -79,7 +75,6 @@ class AdminControllerTest extends TestCase
     {
         $user = User::factory()->create();
         Category::factory()->count(3)->create();
-
 
         Contact::factory()->count(21)->create();
 

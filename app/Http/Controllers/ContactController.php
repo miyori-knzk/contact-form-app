@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreContactRequest;
 use App\Models\Category;
 use App\Models\Contact;
-use App\Models\ContactTag;
 use App\Models\Tag;
-use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\Validator;
 
 class ContactController extends Controller
 {
@@ -58,7 +57,7 @@ class ContactController extends Controller
             'category_id' => $request->category_id,
             'tag_ids' => $request->tag_ids,
             'detail' => $request->detail,
-            ];
+        ];
         $urlQuery = http_build_query($queryArray);
 
         // 修正ボタンが押された時の処理
@@ -68,12 +67,12 @@ class ContactController extends Controller
 
         // 送信時の処理
         // tagのバリデーション追加
-        $tagValidation = Validator::make($request->all(),[
+        $tagValidation = Validator::make($request->all(), [
             'tag_ids' => 'nullable|array',
             'tag_ids.*' => 'integer|exists:tags,id',
         ]);
 
-        if($tagValidation->fails()){
+        if ($tagValidation->fails()) {
             return redirect('?' . $urlQuery);
         }
 

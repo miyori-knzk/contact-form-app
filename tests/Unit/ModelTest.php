@@ -2,14 +2,11 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Contact;
 use App\Models\Category;
-use App\Models\ContactTag;
+use App\Models\Contact;
 use App\Models\Tag;
-
-
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ModelTest extends TestCase
 {
@@ -41,7 +38,6 @@ class ModelTest extends TestCase
 
         $contact->tags()->sync($tags);
 
-
         foreach ($tags as $tag) {
             $this->assertDatabaseHas('contact_tag', [
                 'contact_id' => $contact->id,
@@ -61,11 +57,10 @@ class ModelTest extends TestCase
         $tag = Tag::factory()->create();
         $contacts = Contact::factory()->count(3)->create();
 
-
-        foreach($contacts as $contact){
+        foreach ($contacts as $contact) {
             $contact->tags()->attach($tag->id);
         }
 
-         $this->assertCount(3, $tag->contacts);
+        $this->assertCount(3, $tag->contacts);
     }
 }
