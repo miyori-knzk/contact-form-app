@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreContactRequest;
 use App\Models\Category;
 use App\Models\Contact;
-use App\Models\ContactTag;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Validator;
 
 class ContactController extends Controller
 {
@@ -24,10 +24,12 @@ class ContactController extends Controller
     public function confirm(StoreContactRequest $request)
     {
         $tags = null;
+        $tagArr = [];
 
         $tmpTel = $request->tel1 . '-' . $request->tel2 . '-' . $request->tel3;
 
-        $validated = $request->validated();
+        $tagArr['tag_ids'] = $request->tag_ids;
+        $validated = array_merge($request->validated(), $tagArr);
         $category = Category::findOrFail($validated['category_id']);
         if ($request->filled('tag_ids')) {
             $tags = Tag::whereIn('id', $request->tag_ids)->get();
@@ -43,44 +45,42 @@ class ContactController extends Controller
     {
         $tmpContactTags = [];
 
+        // 入力値保持
+        $queryArray = [
+            'last_name' => $request->last_name,
+            'first_name' => $request->first_name,
+            'gender' => 2,
+            'email' => $request->email,
+            'tel' => $request->tmpTel,
+            'address' => $request->address,
+            'building' => $request->building,
+            'category_id' => $request->category_id,
+            'tag_ids' => $request->tag_ids,
+            'detail' => $request->detail,
+        ];
+        $urlQuery = http_build_query($queryArray);
+
         // 修正ボタンが押された時の処理
         if ($request->back == 'back') {
-            $queryArray = [
-                'last_name' => $request->last_name,
-                'first_name' => $request->first_name,
-                'gender' => 2,
-                'email' => $request->email,
-                'tel' => $request->tmpTel,
-                'address' => $request->address,
-                'building' => $request->building,
-                'category_id' => $request->category_id,
-                'tag_ids' => $request->tag_ids,
-                'detail' => $request->detail,
-            ];
-            $urlQuery = http_build_query($queryArray);
+            return redirect('?' . $urlQuery);
+        }
 
+        // 送信時の処理
+        // tagのバリデーション追加
+        $tagValidation = Validator::make($request->all(), [
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'integer|exists:tags,id',
+        ]);
+
+        if ($tagValidation->fails()) {
             return redirect('?' . $urlQuery);
         }
 
         $contact = Contact::create($request->validated());
-        // dd($contact);
 
-        if ($request->filled('tag_ids')) {
-            foreach ($request->tag_ids as $tag) {
-                $tmpContactTags[] = [
-                    'contact_id' => $contact->id,
-                    'tag_id' => $tag,
-                ];
-            }
-        }
-
-        if (count($tmpContactTags) != 0) {
-            foreach ($tmpContactTags as $tmpContactTag) {
-                $newContactTag = new ContactTag;
-                $newContactTag->contact_id = $tmpContactTag['contact_id'];
-                $newContactTag->tag_id = $tmpContactTag['tag_id'];
-                $newContactTag->save();
-            }
+        if (count($tagValidation->validated()) > 0) {
+            $tagIds = $tagValidation->validated()['tag_ids'];
+            $contact->tags()->attach($tagIds);
         }
 
         return redirect()->route('contacts.thanks');
