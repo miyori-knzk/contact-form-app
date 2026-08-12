@@ -21,7 +21,7 @@ Route::controller(ContactController::class)->name('contacts.')->group(function (
     Route::post('/contacts/confirm', 'confirm')->name('confirm');
     Route::post('/contacts', 'store')->name('store');
     Route::get('/thanks', 'thanks')->name('thanks');
-
+    Route::get('contacts/export', 'export')->name('export');
 });
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
