@@ -96,7 +96,7 @@ Windows11上のWSL(Ubuntu)で開発しています。
 1. **リポジトリをクローン**
 
     ```
-    git clone https://github.com/miyori-knzk/task-manager2.git
+    git clone https://github.com/miyori-knzk/contact-form-app.git
     ```
 
 2. **.envファイルの準備**
