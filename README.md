@@ -105,7 +105,7 @@ Windows11上のWSL(Ubuntu)で開発しています。
     .env.exsampleをコピーして.envを作成
 
     ```
-    cd task-manager2
+    cd contact-form-app
     cp .env.example .env
     ```
 
