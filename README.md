@@ -167,8 +167,10 @@ Windows11上のWSL(Ubuntu)で開発しています。
 8. **フロントエンドのビルド**
 
     ```
-    ./vendor/bin/sail npm run build
+    ./vendor/bin/sail npm run dev
     ```
+
+    **実行しておいたままにしておく**
 
 9. **アプリケーションへのアクセス**
     - ブラウザで<http://localhost>にアクセスしお問い合わせフォームが表示されるか確認。
@@ -185,7 +187,7 @@ Windows11上のWSL(Ubuntu)で開発しています。
 XDEBUG_MODE=coverage
 ```
 
-コンテナの再起動
+コンテナの再起動とフロントエンドの再ビルド
 
 ```
 ./vendor/bin/sail down
