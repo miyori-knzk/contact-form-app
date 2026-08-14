@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use App\Models\Contact;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -26,5 +28,24 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        $message = null;
+
+        if ($exception instanceof ModelNotFoundException) {
+            $excModel = $exception->getModel();
+
+            if ($excModel == Contact::class) {
+                $message = 'お問い合わせ';
+            }
+
+            return response()->json([
+                'message' => $message . 'が見つかりませんでした。',
+            ], 404);
+        }
+
+        return parent::render($request, $exception);
     }
 }
