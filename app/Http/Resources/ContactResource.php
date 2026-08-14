@@ -16,6 +16,7 @@ class ContactResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'category' => new CategoryResource($this->category),
             'last_name' => $this->last_name,
             'first_name' => $this->first_name,
             'gender' => $this->gender,
@@ -24,6 +25,7 @@ class ContactResource extends JsonResource
             'address' => $this->address,
             'building' => $this->building,
             'detail' => $this->detail,
+            'tags' => TagResource::collection($this->tags),
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

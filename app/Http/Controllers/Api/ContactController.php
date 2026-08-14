@@ -7,9 +7,7 @@ use App\Http\Requests\Api\V1\IndexContactRequest;
 use App\Http\Requests\Api\V1\StoreContactRequest;
 use App\Http\Resources\ContactResource;
 use App\Models\Contact;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContactController extends Controller
 {
@@ -18,6 +16,7 @@ class ContactController extends Controller
      */
     public function index(IndexContactRequest $request): AnonymousResourceCollection
     {
+
         $perPage = 20;
         if ($request->filled('per_page')) {
             $perPage = $request->per_page;
@@ -32,17 +31,15 @@ class ContactController extends Controller
      */
     public function store(StoreContactRequest $request)
     {
-        JsonResource::wrap('ContactResource');
-
-        $contact = Contact::create($request->validated());
+        $tagIds = [];
 
         $validated = $request->validated();
-        if ($validated->tag_ids > 0) {
-            $tagIds = $validated->tag_ids;
-            $contact->tags()->attach($tagIds);
-        }
+        $contact = Contact::create($request->validated());
+        $tagIds = $validated['tag_ids'];
 
-        return responce()->json($contact->load(['category', 'tag'], 201));
+        $contact->tags()->attach($tagIds);
+
+        return (new ContactResource($contact))->response()->setStatusCode(201);
     }
 
     /**
@@ -50,8 +47,6 @@ class ContactController extends Controller
      */
     public function show(Contact $contact): ContactResource
     {
-        JsonResource::wrap('ContactResource');
-
         $contact->load(['category', 'tags']);
 
         return new ContactResource($contact);
@@ -60,16 +55,24 @@ class ContactController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StoreContactRequest $request, Contact $contact)
     {
-        //
+        $validated = $request->validated();
+        $tagIds = $validated['tag_ids'];
+        $contact->update($validated);
+        $contact->tags()->sync($tagIds);
+        $contact->load(['category', 'tags']);
+
+        return (new ContactResource($contact))->response()->setStatusCode(200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Contact $contact)
     {
-        //
+        $contact->delete();
+
+        return response()->json(null, 204);
     }
 }

@@ -4,9 +4,8 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
 
-class StoreContactRequest extends FormRequest
+class UpdateContactRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +22,6 @@ class StoreContactRequest extends FormRequest
      */
     public function rules(): array
     {
-        Log::debug('koko');
-
         return [
             'last_name' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',

@@ -19,8 +19,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::controller(ContactController::class)->prefix('V1/contacts')->group(function () {
+Route::controller(ContactController::class)->prefix('v1/contacts')->group(function () {
     Route::get('/', 'index');
     Route::get('/{contact}', 'show');
     Route::post('/', 'store');
+    Route::put('/{contact}', 'update');
+    Route::delete('/{contact}', 'destroy');
 });
