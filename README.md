@@ -77,6 +77,7 @@ erDiagram
     }
 
     tags ||--o{ contact_tag : "has many"
+    contacts ||--o{ contact_tag : "has many"
     categories ||--o{ contacts : "has many"
 
 
