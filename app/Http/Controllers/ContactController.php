@@ -104,6 +104,9 @@ class ContactController extends Controller
         $callback = function () use ($request) {
 
             $handle = fopen('php://output', 'w');
+
+            fwrite($handle, "\xEF\xBB\xBF");
+
             fputcsv($handle, ['ID', '氏名', '性別', 'メール', '電話', '住所', '建物', 'カテゴリ', '内容', '作成日時']);
             $contacts = Contact::makeQuery($request)->with('category')->orderBy('id', 'desc')->get();
 
