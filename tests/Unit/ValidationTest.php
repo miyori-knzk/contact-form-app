@@ -168,4 +168,178 @@ class ValidationTest extends TestCase
         ]);
         $responce->assertSessionHasNoErrors();
     }
+
+    /** @test */
+    public function cs_v出力時に正しいフィルタ条件を受け付ける()
+    {
+        Category::factory()->count(5)->create();
+        $tags = Tag::factory()->count(5)->create();
+
+        $contacts = Contact::factory()->count(50)->create();
+        $contactData = Contact::factory()->create([
+            'first_name' => 'テスト名',
+            'gender' => 1,
+            'category_id' => 2,
+        ]);
+
+        foreach ($contacts as $contact) {
+            $rand = mt_rand(1, 3);
+            $contact->tags()->attach($tags->random($rand)->pluck('id')->toArray());
+        }
+
+        $serchDate = date('Y-m-d');
+        $urlQuery = http_build_query([
+            'keyword' => 'テスト名',
+            'gender' => 1,
+            'category_id' => 2,
+            'date' => 2,
+        ]);
+
+        $response = $this->get('/contacts/export?' . $urlQuery);
+        $response->assertStatus(302);
+    }
+
+    /** @test */
+    public function cs_v出力時に不正な性別を拒否する()
+    {
+        Category::factory()->count(5)->create();
+        $tags = Tag::factory()->count(5)->create();
+
+        $contacts = Contact::factory()->count(50)->create();
+        $contactData = Contact::factory()->create([
+            'first_name' => 'テスト名',
+            'gender' => 1,
+            'category_id' => 2,
+        ]);
+
+        foreach ($contacts as $contact) {
+            $rand = mt_rand(1, 3);
+            $contact->tags()->attach($tags->random($rand)->pluck('id')->toArray());
+        }
+
+        $serchDate = date('Y-m-d');
+        $urlQuery = http_build_query([
+            'keyword' => 'テスト名',
+            'gender' => 99,
+            'category_id' => 2,
+            'date' => 2,
+        ]);
+
+        $response = $this->get('/contacts/export?' . $urlQuery);
+
+        $response->assertSessionHasErrors('gender');
+    }
+
+    /** @test */
+    public function cs_v出力時に存在しないカテゴリ_i_dを拒否する()
+    {
+        Category::factory()->count(5)->create();
+        $tags = Tag::factory()->count(5)->create();
+
+        $contacts = Contact::factory()->count(50)->create();
+        $contactData = Contact::factory()->create([
+            'first_name' => 'テスト名',
+            'gender' => 1,
+            'category_id' => 2,
+        ]);
+
+        foreach ($contacts as $contact) {
+            $rand = mt_rand(1, 3);
+            $contact->tags()->attach($tags->random($rand)->pluck('id')->toArray());
+        }
+
+        $serchDate = date('Y-m-d');
+        $urlQuery = http_build_query([
+            'keyword' => 'テスト名',
+            'gender' => 1,
+            'category_id' => 99,
+            'date' => $serchDate,
+        ]);
+
+        $response = $this->get('/contacts/export?' . $urlQuery);
+
+        $response->assertSessionHasErrors('category_id');
+    }
+
+    /** @test */
+    public function ap_i検索時に_index_contact_requestのフィルタが有効である()
+    {
+        $category = Category::factory()->create();
+        $contacts = Contact::factory()->count(20)->create();
+        $tags = Tag::factory()->count(5)->create();
+
+        foreach ($contacts as $contact) {
+            $rand = mt_rand(1, 5);
+            $contact->tags()->attach($tags->random($rand)->pluck('id')->toArray());
+        }
+
+        $response = $this->getJson('/api/v1/contacts');
+
+        $response->assertJsonMissingValidationErrors(['keyword',  'gender', 'category_id', 'date', 'page', 'per_page']);
+        $response->assertOk();
+    }
+
+    /** @test */
+    public function ap_i検索時に_index_contact_requestで不正な値を拒否する()
+    {
+        $category = Category::factory()->create();
+        $contact = Contact::factory()->create();
+
+        $data = [
+            'keyword' => str_repeat('あ', 256),
+            'gender' => 99,
+            'category_id' => 99,
+            'date' => 'abc',
+            'page' => 'first',
+            'per_page' => 101,
+        ];
+
+        $urlQuery = http_build_query($data);
+        $url = '/api/v1/contacts?' . $urlQuery;
+
+        $response = $this->getJson($url);
+
+        $response->assertJsonValidationErrors(['keyword',  'gender', 'category_id', 'date', 'page', 'per_page']);
+    }
+
+    /** @test */
+    public function ap_i作成時に_index_contact_requestの全必須項目・タグ入力を受け付けること()
+    {
+        $tagIds = [];
+        $category = Category::factory()->create();
+        $contact = Contact::factory()->raw();
+        $tags = Tag::factory()->count(5)->create();
+
+        $rand = mt_rand(1, 5);
+        $tagIds['tag_ids'] = $tags->random($rand)->pluck('id')->toArray();
+
+        $response = $this->postJson('/api/v1/contacts', array_merge($contact, $tagIds));
+
+        $response->assertJsonMissingValidationErrors();
+    }
+
+    /** @test */
+    public function ap_i作成時に_index_contact_requestで不正な値を拒否すること()
+    {
+        $contact = [];
+
+        $category = Category::factory()->create();
+        $contact = Contact::factory()->raw();
+
+        $contact['last_name'] = str_repeat('あ', 256);
+        $contact['first_name'] = 111;
+        $contact['gender'] = 99;
+        $contact['email'] = 99;
+        $contact['tel'] = 999;
+        $contact['address'] = str_repeat('あ', 256);
+        $contact['building'] = str_repeat('あ', 256);
+        $contact['building'] = str_repeat('あ', 256);
+        $contact['category_id'] = 99;
+        $contact['detail'] = str_repeat('あ', 121);
+        $contact['tag_ids'] = 99;
+
+        $response = $this->postJson('/api/v1/contacts', $contact);
+
+        $response->assertJsonValidationErrors(['last_name', 'first_name', 'gender', 'email', 'tel', 'address', 'building', 'category_id', 'detail', 'tag_ids']);
+    }
 }

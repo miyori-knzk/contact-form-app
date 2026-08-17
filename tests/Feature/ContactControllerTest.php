@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Contact;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -245,5 +246,76 @@ class ContactControllerTest extends TestCase
             'first_name' => 'テスト名',
             'detail' => 'テスト',
         ]);
+    }
+
+    /** @test */
+    public function ログイン済みの管理者がフィルタ条件付きで_cs_vを_d_lできる()
+    {
+        $user = User::factory()->create();
+        Category::factory()->count(5)->create();
+        $tags = Tag::factory()->count(5)->create();
+        $contactData = Contact::factory()->create([
+            'last_name' => 'テスト姓',
+            'first_name' => 'テスト名',
+            'email' => 'test@test',
+            'gender' => 1,
+            'category_id' => 2,
+        ]);
+        $contacts = Contact::factory()->count(50)->create();
+
+        foreach ($contacts as $contact) {
+            $rand = mt_rand(1, 3);
+            $contact->tags()->attach($tags->random($rand)->pluck('id')->toArray());
+        }
+
+        $serchDate = date('Y-m-d');
+        $urlQuery = http_build_query([
+            'keyword' => 'test',
+            'gender' => 1,
+            'category_id' => 2,
+            'date' => $serchDate,
+        ]);
+
+        $response = $this->actingAs($user)->get('/contacts/export?' . $urlQuery);
+
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_clean();
+        $dataCnt = count(array_filter(explode("\n", $content))) - 1;
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+        $this->assertStringContainsString('test@test', $content);
+        $this->assertEquals(1, $dataCnt);
+    }
+
+    /** @test */
+    public function ログイン済みの管理者が無指定時は新着順で_cs_vを_d_lできる()
+    {
+        $user = User::factory()->create();
+        Category::factory()->count(5)->create();
+        $tags = Tag::factory()->count(5)->create();
+        $contacts = Contact::factory()->count(50)->create();
+
+        foreach ($contacts as $contact) {
+            $rand = mt_rand(1, 3);
+            $contact->tags()->attach($tags->random($rand)->pluck('id')->toArray());
+        }
+
+        $response = $this->actingAs($user)->get('/contacts/export?');
+
+        ob_start();
+        $response->sendContent();
+        $contents = ob_get_clean();
+        $contentsArr = array_filter(explode("\n", $contents));
+
+        $firstData = $contentsArr[1];
+        $lastData = $contentsArr[50];
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+        $this->assertEquals(50, count($contentsArr) - 1);
+        $this->assertStringContainsString('1', array_filter(explode(',', $lastData))[0]);
+        $this->assertStringContainsString('50', array_filter(explode(',', $firstData))[0]);
     }
 }

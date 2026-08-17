@@ -105,7 +105,7 @@ class ContactController extends Controller
 
             $handle = fopen('php://output', 'w');
             fputcsv($handle, ['ID', '氏名', '性別', 'メール', '電話', '住所', '建物', 'カテゴリ', '内容', '作成日時']);
-            $contacts = Contact::makeQuery($request)->with('category')->orderBy('created_at', 'desc')->get();
+            $contacts = Contact::makeQuery($request)->with('category')->orderBy('id', 'desc')->get();
 
             foreach ($contacts as $contact) {
                 fputcsv($handle, [
